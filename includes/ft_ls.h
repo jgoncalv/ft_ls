@@ -1,7 +1,7 @@
 #ifndef FT_LS_H
 # define FT_LS_H
 
-# include "../libft/include/libft.h"
+# include "libft.h"
 # define USAGE "Usage: ./ft_ls [-lRart] [file...]\n"
 
 

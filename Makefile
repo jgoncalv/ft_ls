@@ -5,76 +5,61 @@
 #                                                     +:+ +:+         +:+      #
 #    By: jgoncalv <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2017/03/15 16:00:09 by jgoncalv          #+#    #+#              #
-#    Updated: 2017/03/15 16:00:15 by jgoncalv         ###   ########.fr        #
+#    Created: 2017/03/27 15:05:44 by jgoncalv          #+#    #+#              #
+#    Updated: 2017/03/27 15:05:45 by jgoncalv         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-.PHONY: all, clean, fclean, re
+NAME		=	ft_ls
 
-NAME = ft_ls
+CC			=	gcc
+FLAGS		=	-Wall -Wextra -Werror
 
-CC = gcc
+LIBFT_DIR	=	libft/
+LIBFT_LIB	=	$(LIBFT_DIR)libft.a
+LIBFT_INC	=	$(LIBFT_DIR)includes/
 
-CFLAGS = -Wall -Wextra -Werror -g
+SRC_DIR		=	srcs/
+INC_DIR		=	includes/
+OBJ_DIR		=	objs/
 
-LIB = libft/
+SRC_FILE	=	main.c\
+init.c\
 
-LIB_A = $(LIB)libft.a
+SRCS		=	$(addprefix $(SRC_DIR), $(SRC_FILE))
+OBJS		=	$(addprefix $(OBJ_DIR), $(SRC_FILE:.c=.o))
 
-LDFLAGS = -Llibft
+all:			$(NAME)
 
-LDLIBS = -lft
+$(NAME):		$(LIBFT_LIB) $(OBJ_DIR) $(OBJS)
+	@$(CC) $(FLAGS) -I $(INC_DIR) -I $(LIBFT_INC) $(LIBFT_LIB) $(OBJS) -o $(NAME)
 
-SRC_PATH = srcs/
+$(LIBFT_LIB):
+	@make -j -C $(LIBFT_DIR)
 
-SRC_NAME = main.c\
-		init.c
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(dir $(OBJS))
 
-INC = include/ft_ls.h
+$(OBJ_DIR)%.o:	$(SRC_DIR)%.c | $(OBJ_DIR)
+	@$(CC) $(FLAGS) -MMD -c $< -o $@ -I $(INC_DIR) -I $(LIBFT_INC)
 
-AR = ar rc
+clean:			cleanlib
+	@rm -rf $(OBJ_DIR)
 
-INC_LIB = -Ilibft/includes/
+cleanlib:
+	@make -C $(LIBFT_DIR) clean
 
-CPPFLAGS = -Iincludes/
-
-OBJ_PATH = obj
-
-OBJ_NAME = $(SRC_NAME:.c=.o)
-
-SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
-
-OBJ = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME))
-
-all: $(LIB_A) $(NAME)
-
-$(LIB_A):
-	@make -C $(LIB)
-
-$(NAME): $(OBJ)
-	@echo $(NAME) ": Sources compiling..."
-	@$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) $(OBJ) -o $(NAME)
-	@echo "Executable "$(NAME)" made"
-
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
-	@mkdir -p $(OBJ_PATH) 2> /dev/null || true
-	@mkdir -p $(dir $(OBJ)) 2> /dev/null || true
-	@$(CC) -c $(CPPFLAGS) $(INC_LIB) $(CFLAGS) $< -o $@ 
-
-clean:
-	@make fclean -C $(LIB)
-	@rm -f $(OBJ)
-	@rm -rf $(OBJ_PATH) || true
-	@echo $(OBJ_PATH)" supprimé !"
-
-fclean: clean
+fclean:			clean fcleanlib
 	@rm -f $(NAME)
-	@echo "Executable de "$(NAME)" supprimé !"
 
-re: fclean all
-	@echo "Make re done !"
+fcleanlib:		cleanlib
+	@make -C $(LIBFT_DIR) fclean
 
-norme:
-	norminette $(SRC)
-	norminette $(INC_PATH)
+re:				fclean all
+
+relib:			fcleanlib $(LIBFT_LIB)
+
+.PHONY:			fclean clean re relib cleanlib fcleanlib
+
+-include $(OBJS:.o=.d)
