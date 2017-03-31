@@ -1,37 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   display.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgoncalv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/03/28 20:05:10 by jgoncalv          #+#    #+#             */
-/*   Updated: 2017/03/28 20:05:11 by jgoncalv         ###   ########.fr       */
+/*   Created: 2017/03/30 22:14:49 by jgoncalv          #+#    #+#             */
+/*   Updated: 2017/03/30 22:14:50 by jgoncalv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-static void	init_env(t_env *env)
+void	add_file_to_buf(t_env *e, char *str)
 {
-	env->args = NULL;
-	env->flag = (t_flags){0, 0, 0, 0, 0};
-	env->args_alone = 0;
-	env->buf[0] = '\0';
-	env->buflen = 0;
+	int	len;
+
+	len = ft_strlen(str);
+	if (e->buflen + len + 1 < DISPLAY_SIZE)
+	{
+		ft_strcpy(e->buf + e->buflen, str);
+		e->buflen += len;
+	}
+	else
+	{
+		write(1, e->buf, e->buflen);
+		e->buf[0] = '\0';
+		ft_strcpy(e->buf, str);
+		e->buflen = len;
+	}
 }
 
-int			main(int ac, char **av)
+void	display_buf(t_env *e)
 {
-	t_env	env;
-
-	(void)ac;
-	init_env(&env);
-	init_ls(&env, av);
-	arg_sort(&env.args, &env);
-	if (env.args == NULL)
-		return (1);
-	env.args_alone = (env.args->next != NULL ? 0 : 1);
-	ls_output(&env);
-	return (0);
+	write(1, e->buf, e->buflen);
+	e->buf[0] = '\0';
+	e->buflen = 0;
 }

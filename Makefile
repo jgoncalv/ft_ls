@@ -6,14 +6,14 @@
 #    By: jgoncalv <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/03/27 15:05:44 by jgoncalv          #+#    #+#              #
-#    Updated: 2017/03/27 15:05:45 by jgoncalv         ###   ########.fr        #
+#    Updated: 2017/03/28 20:05:35 by jgoncalv         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	ft_ls
 
 CC			=	gcc
-FLAGS		=	-Wall -Wextra -Werror
+FLAGS		=	-Wall -Wextra -Werror -g
 
 LIBFT_DIR	=	libft/
 LIBFT_LIB	=	$(LIBFT_DIR)libft.a
@@ -25,6 +25,11 @@ OBJ_DIR		=	objs/
 
 SRC_FILE	=	main.c\
 init.c\
+stat_args.c\
+ls_output.c\
+args_lst.c\
+args_sort.c\
+display.c
 
 SRCS		=	$(addprefix $(SRC_DIR), $(SRC_FILE))
 OBJS		=	$(addprefix $(OBJ_DIR), $(SRC_FILE:.c=.o))
