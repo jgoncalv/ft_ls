@@ -12,16 +12,18 @@
 
 #include "ft_ls.h"
 
-t_args	*args_maillon(char *name)
+t_args		*args_maillon(char *name)
 {
 	t_args	*args;
 
-	if (!(args = (t_args*)ft_memalloc(sizeof(t_args))))
-		return (NULL);
 	if (!name)
+		return (NULL);
+	if (!(args = (t_args*)ft_memalloc(sizeof(t_args))))
 		return (NULL);
 	ft_strcpy(args->name, name);
 	args->args_son = NULL;
+	args->nlink = NULL;
+	args->size = NULL;
 	args->type_dir = 0;
 	args->next = NULL;
 	args->prev = NULL;
@@ -47,14 +49,6 @@ void		argslst(t_args **alst, t_args *nargs)
 	}
 }
 
-void		args_del(t_args **args)
-{
-	if (!*args)
-		return ;
-	free(*args);
-	*args = NULL;
-}
-
 void		args_del_maillon(t_args **args)
 {
 	if (!*args)
@@ -64,5 +58,25 @@ void		args_del_maillon(t_args **args)
 	if ((*args)->next != NULL)
 		(*args)->next->prev = (*args)->prev;
 	free(*args);
+	*args = NULL;
+}
+
+void		args_del_list(t_args **args)
+{
+	t_args *tmp;
+
+	if (*args)
+	{
+		while (*args)
+		{
+			ft_strdel(&(*args)->nlink);
+			ft_strdel(&(*args)->size);
+			if ((*args)->args_son)
+				args_del_list(&(*args)->args_son);
+			tmp = *args;
+			*args = (*args)->next;
+			free(tmp);
+		}
+	}
 	*args = NULL;
 }

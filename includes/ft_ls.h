@@ -14,13 +14,24 @@
 # define FT_LS_H
 
 # include "libft.h"
-# include <sys/types.h> 
-# include <sys/stat.h> 
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <sys/acl.h>
+# include <sys/xattr.h>
 # include <unistd.h>
 # include <dirent.h>
-
+# include <pwd.h>
+# include <grp.h>
 # define USAGE "Usage: ./ft_ls [-lRart] [file...]\n"
-# define DISPLAY_SIZE 1024
+# define DISPLAY_SIZE 2048
+
+typedef struct		s_length
+{
+	int				nlink;
+	int				size;
+	int				userid;
+	int				groupid;
+}					t_length;
 
 typedef struct		s_flags
 {
@@ -35,7 +46,15 @@ typedef struct		s_args
 {
 	char			name[256];
 	int				type_dir;
-	struct stat		buf_stat;
+	char			mode[12];
+	char			*nlink;
+	char			*size;
+	char			userid[256];
+	char			groupid[256];
+	char			time[13];
+	unsigned int	timespend;
+	unsigned int	block;
+	char			link[2048];
 	struct s_args	*args_son;
 	struct s_args	*next;
 	struct s_args	*prev;
@@ -51,25 +70,28 @@ typedef struct		s_env
 }					t_env;
 
 void				init_ls(t_env *env, char **av);
-int					stat_args(char *name, struct stat *statbuf);
-int					lstat_args(char *name, struct stat *statbuf);
+int					stat_args(char *name, struct stat *statbuf, t_env *e);
+int					lstat_args(char *name, struct stat *statbuf, t_env *e);
 void				ls_output(t_env *env);
-
+void				get_file_info(t_env *e, t_args *arg, char *file_name);
 /*
 **	ARGS LST
 */
-
 t_args				*args_maillon(char *name);
-void				args_del(t_args **args);
+void				args_del_list(t_args **args);
 void				args_del_maillon(t_args **args);
 void				argslst(t_args **alst, t_args *nargs);
 void				arg_sort(t_args **alst, t_env *e);
-
 /*
 **	DISPLAY
 */
-
 void				display_buf(t_env *e);
-void				add_file_to_buf(t_env *e, char *str);
+void				add_file_to_buf(t_env *e, t_args *arg, t_length len);
+void				add_str_to_buf(t_env *e, char *str);
+t_length			len_for_option(t_env *e, t_args *arg);
+void				open_dir(t_args *l_args, t_env *e, char *path);
+char				*strjoin_path(char *s1, char *s2);
+void				arg_swap(t_args **alst, t_args *curr, t_args *comp);
+char				get_acl(char *path);
 
 #endif

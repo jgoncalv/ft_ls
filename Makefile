@@ -29,7 +29,13 @@ stat_args.c\
 ls_output.c\
 args_lst.c\
 args_sort.c\
-display.c
+display.c\
+struc_length_l.c\
+file_info.c\
+open_dir.c\
+joinpath.c\
+swap_arg.c\
+bonus.c
 
 SRCS		=	$(addprefix $(SRC_DIR), $(SRC_FILE))
 OBJS		=	$(addprefix $(OBJ_DIR), $(SRC_FILE:.c=.o))

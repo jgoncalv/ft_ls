@@ -45,34 +45,40 @@ static int		check_arg(t_flags *flag, char *arg)
 	return (1);
 }
 
+static void		nothing(t_env *e, t_args *arg)
+{
+	struct stat	statbuf;
 
-void			init_ls(t_env *env, char **av)
+	stat_args(".", &statbuf, e);
+	arg = args_maillon(".");
+	if (S_ISDIR(statbuf.st_mode))
+		arg->type_dir = 1;
+	argslst(&e->args, arg);
+}
+
+void			init_ls(t_env *e, char **av)
 {
 	int			i;
-	t_args		*args;
+	t_args		*arg;
 	struct stat	statbuf;
 
 	i = 1;
-	while (av[i] && check_arg(&env->flag, av[i]))
+	arg = NULL;
+	while (av[i] && check_arg(&e->flag, av[i]))
 		i++;
 	if (av[i] && !ft_strcmp(av[i], "--"))
 		i++;
 	if (!av[i])
-	{
-		stat_args(".", &statbuf);
-		args = args_maillon(".");
-		if (S_ISDIR(statbuf.st_mode))
-			args->type_dir = 1;
-		argslst(&env->args, args);
-	}
+		nothing(e, arg);
 	while (av[i])
 	{
-		if (stat_args(av[i], &statbuf))
+		if (stat_args(av[i], &statbuf, e))
 		{
-			args = args_maillon(av[i]);
+			arg = args_maillon(av[i]);
 			if (S_ISDIR(statbuf.st_mode))
-				args->type_dir = 1;
-			argslst(&env->args, args);
+				arg->type_dir = 1;
+			get_file_info(e, arg, av[i]);
+			argslst(&e->args, arg);
 		}
 		i++;
 	}

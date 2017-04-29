@@ -12,43 +12,65 @@
 
 #include "ft_ls.h"
 
-static void	arg_swap(t_args **alst, t_args *curr, t_args *comp)
+static t_args	*do_the_comp(t_env *e, t_args *tmp, t_args *curr, t_args *comp)
 {
-	t_args *tmp;
-
-	if (*alst == curr)
-		*alst = comp;
-	if (curr->prev != NULL)
-		curr->prev->next = comp;
-	if (comp->next != NULL)
-		comp->next->prev = curr;
-	if (curr->next == comp)
+	if (e->flag.time)
 	{
-		curr->next = comp->next;
-		comp->next = curr;
-		comp->prev = curr->prev;
-		curr->prev = comp;
+		if (curr->timespend < comp->timespend ||
+			(curr->timespend == comp->timespend &&
+				ft_strcmp(curr->name, comp->name) > 0))
+		{
+			if (!tmp)
+				tmp = comp;
+			else if (tmp->timespend < comp->timespend ||
+				(tmp->timespend == comp->timespend &&
+					ft_strcmp(tmp->name, comp->name) > 0))
+				tmp = comp;
+		}
 	}
 	else
 	{
-		comp->prev->next = curr;
-		curr->next->prev = comp;
-		tmp = curr->prev;
-		curr->prev = comp->prev;
-		comp->prev = tmp;
-		tmp = curr->next;
-		curr->next = comp->next;
-		comp->next = tmp;
+		if (ft_strcmp(curr->name, comp->name) > 0)
+		{
+			if (!tmp)
+				tmp = comp;
+			else if (ft_strcmp(tmp->name, comp->name) > 0)
+				tmp = comp;
+		}
+	}
+	return (tmp);
+}
+
+static void		reverse_list(t_args **alst)
+{
+	t_args	*curr;
+	t_args	*last;
+	t_args	*tmp;
+
+	last = *alst;
+	curr = *alst;
+	tmp = NULL;
+	while (last && last->next)
+		last = last->next;
+	while (curr && curr != last)
+	{
+		tmp = last;
+		arg_swap(alst, curr, last);
+		last = curr;
+		curr = tmp;
+		if (curr->next == last)
+			break ;
+		curr = curr->next;
+		last = last->prev;
 	}
 }
 
-void		arg_sort(t_args **alst, t_env *e)
+static void		sort_list(t_args **alst, t_env *e)
 {
 	t_args	*curr;
 	t_args	*comp;
 	t_args	*tmp;
 
-	(void)e;
 	curr = *alst;
 	tmp = NULL;
 	while (curr)
@@ -56,13 +78,7 @@ void		arg_sort(t_args **alst, t_env *e)
 		comp = curr->next;
 		while (comp)
 		{
-			if (ft_strcmp(curr->name, comp->name) > 0)
-			{
-				if (!tmp)
-					tmp = comp;
-				else if (ft_strcmp(tmp->name, comp->name) > 0)
-					tmp = comp;
-			}
+			tmp = do_the_comp(e, tmp, curr, comp);
 			comp = comp->next;
 		}
 		if (tmp)
@@ -73,4 +89,11 @@ void		arg_sort(t_args **alst, t_env *e)
 		}
 		curr = curr->next;
 	}
+}
+
+void			arg_sort(t_args **alst, t_env *e)
+{
+	sort_list(alst, e);
+	if (e->flag.reverse)
+		reverse_list(alst);
 }

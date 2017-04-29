@@ -12,26 +12,80 @@
 
 #include "ft_ls.h"
 
-void	add_file_to_buf(t_env *e, char *str)
+void		add_str_to_buf(t_env *e, char *str)
 {
-	int	len;
+	int len;
+	int i;
 
 	len = ft_strlen(str);
-	if (e->buflen + len + 1 < DISPLAY_SIZE)
+	i = 0;
+	while (i < len && i + e->buflen < DISPLAY_SIZE - 1)
 	{
-		ft_strcpy(e->buf + e->buflen, str);
-		e->buflen += len;
+		e->buf[e->buflen + i] = str[i];
+		i++;
 	}
-	else
+	e->buflen += i;
+	if (i < len)
 	{
-		write(1, e->buf, e->buflen);
-		e->buf[0] = '\0';
-		ft_strcpy(e->buf, str);
-		e->buflen = len;
+		display_buf(e);
+		add_str_to_buf(e, str + i);
 	}
 }
 
-void	display_buf(t_env *e)
+static void	add_str_to_buf_align(t_env *e, char *str, int len, int align)
+{
+	int i;
+	int	space;
+
+	i = 0;
+	if (align == 1)
+	{
+		space = len - ft_strlen(str);
+		while (i < space)
+		{
+			add_str_to_buf(e, " ");
+			i++;
+		}
+		add_str_to_buf(e, str);
+	}
+	else
+	{
+		add_str_to_buf(e, str);
+		i = ft_strlen(str);
+		while (i < len)
+		{
+			add_str_to_buf(e, " ");
+			i++;
+		}
+	}
+}
+
+void		add_file_to_buf(t_env *e, t_args *arg, t_length len)
+{
+	if (e->flag.long_list == 1)
+	{
+		add_str_to_buf(e, arg->mode);
+		add_str_to_buf(e, " ");
+		add_str_to_buf_align(e, arg->nlink, len.nlink, 1);
+		add_str_to_buf(e, " ");
+		add_str_to_buf_align(e, arg->userid, len.userid, 0);
+		add_str_to_buf(e, "  ");
+		add_str_to_buf_align(e, arg->groupid, len.groupid, 0);
+		add_str_to_buf(e, "  ");
+		add_str_to_buf_align(e, arg->size, len.size, 1);
+		add_str_to_buf(e, " ");
+		add_str_to_buf(e, arg->time);
+		add_str_to_buf(e, " ");
+	}
+	add_str_to_buf(e, arg->name);
+	if (e->flag.long_list && arg->mode[0] == 'l')
+	{
+		add_str_to_buf(e, " -> ");
+		add_str_to_buf(e, arg->link);
+	}
+}
+
+void		display_buf(t_env *e)
 {
 	write(1, e->buf, e->buflen);
 	e->buf[0] = '\0';
