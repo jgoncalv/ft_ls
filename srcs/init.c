@@ -24,6 +24,20 @@ static int		add_arg(t_flags *flag, char c)
 		return (flag->reverse = 1);
 	else if (c == 't')
 		return (flag->time = 1);
+	else if (c == 'f')
+	{
+		flag->hide = 1;
+		return (flag->dont_sort = 1);
+	}
+	else if (c == 's')
+		return (flag->show_size = 1);
+	else if (c == 'A')
+		return (flag->restr_hide = 1);
+	else if (c == 'o')
+	{
+		flag->without_gid = 1;
+		return (flag->long_list = 1);
+	}
 	return (0);
 }
 

@@ -12,29 +12,35 @@
 
 #include "ft_ls.h"
 
+static void	ft_read_dir2(t_args *l_args, t_env *e,
+	char *path, struct dirent *rddir)
+{
+	char			*join_path;
+	t_args			*arg;
+
+	arg = args_maillon(rddir->d_name);
+	if (rddir->d_type == DT_DIR)
+		arg->type_dir = 1;
+	if (e->flag.long_list || e->flag.time || e->flag.show_size)
+	{
+		join_path = strjoin_path(path, rddir->d_name);
+		get_file_info(e, arg, join_path);
+		ft_strdel(&join_path);
+	}
+	argslst(&l_args->args_son, arg);
+}
+
 static void	ft_read_dir(t_args *l_args, t_env *e, char *path, DIR *dirp)
 {
 	struct dirent	*rddir;
-	t_args			*arg;
-	char			*join_path;
 
 	while ((rddir = readdir(dirp)))
 	{
-		if (e->flag.hide == 0 && *rddir->d_name == '.')
-			;
-		else
-		{
-			arg = args_maillon(rddir->d_name);
-			if (rddir->d_type == DT_DIR)
-				arg->type_dir = 1;
-			if (e->flag.long_list || e->flag.time)
-			{
-				join_path = strjoin_path(path, rddir->d_name);
-				get_file_info(e, arg, join_path);
-				ft_strdel(&join_path);
-			}
-			argslst(&l_args->args_son, arg);
-		}
+		if (e->flag.restr_hide && ft_strcmp(rddir->d_name, ".")
+			&& ft_strcmp(rddir->d_name, ".."))
+			ft_read_dir2(l_args, e, path, rddir);
+		else if (*rddir->d_name != '.' || e->flag.hide)
+			ft_read_dir2(l_args, e, path, rddir);
 	}
 }
 

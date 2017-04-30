@@ -22,7 +22,7 @@
 # include <dirent.h>
 # include <pwd.h>
 # include <grp.h>
-# define USAGE "Usage: ./ft_ls [-lRart] [file...]\n"
+# define USAGE "Usage: ./ft_ls [-lRartfsoA] [file...]\n"
 # define DISPLAY_SIZE 2048
 
 typedef struct		s_length
@@ -31,6 +31,7 @@ typedef struct		s_length
 	int				size;
 	int				userid;
 	int				groupid;
+	int				block;
 }					t_length;
 
 typedef struct		s_flags
@@ -40,6 +41,10 @@ typedef struct		s_flags
 	int				hide;
 	int				reverse;
 	int				time;
+	int				dont_sort;
+	int				show_size;
+	int				without_gid;
+	int				restr_hide;
 }					t_flags;
 
 typedef struct		s_args
@@ -54,6 +59,7 @@ typedef struct		s_args
 	char			time[13];
 	unsigned int	timespend;
 	unsigned int	block;
+	unsigned int	last_access;
 	char			link[2048];
 	struct s_args	*args_son;
 	struct s_args	*next;

@@ -15,7 +15,7 @@
 static void	init_env(t_env *env)
 {
 	env->args = NULL;
-	env->flag = (t_flags){0, 0, 0, 0, 0};
+	env->flag = (t_flags){0, 0, 0, 0, 0, 0, 0, 0, 0};
 	env->args_alone = 0;
 	env->buf[0] = '\0';
 	env->buflen = 0;

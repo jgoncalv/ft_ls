@@ -60,9 +60,23 @@ static void	add_str_to_buf_align(t_env *e, char *str, int len, int align)
 	}
 }
 
+static void	bonus_add(t_env *e, t_args *arg, t_length len)
+{
+	char	*block;
+
+	if (e->flag.show_size)
+	{
+		block = ft_itoa(arg->block);
+		add_str_to_buf_align(e, block, len.block, 1);
+		add_str_to_buf(e, " ");
+		ft_strdel(&block);
+	}
+}
+
 void		add_file_to_buf(t_env *e, t_args *arg, t_length len)
 {
-	if (e->flag.long_list == 1)
+	bonus_add(e, arg, len);
+	if (e->flag.long_list)
 	{
 		add_str_to_buf(e, arg->mode);
 		add_str_to_buf(e, " ");
@@ -70,8 +84,11 @@ void		add_file_to_buf(t_env *e, t_args *arg, t_length len)
 		add_str_to_buf(e, " ");
 		add_str_to_buf_align(e, arg->userid, len.userid, 0);
 		add_str_to_buf(e, "  ");
-		add_str_to_buf_align(e, arg->groupid, len.groupid, 0);
-		add_str_to_buf(e, "  ");
+		if (!e->flag.without_gid)
+		{
+			add_str_to_buf_align(e, arg->groupid, len.groupid, 0);
+			add_str_to_buf(e, "  ");
+		}
 		add_str_to_buf_align(e, arg->size, len.size, 1);
 		add_str_to_buf(e, " ");
 		add_str_to_buf(e, arg->time);

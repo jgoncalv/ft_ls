@@ -20,6 +20,40 @@ static t_length	init_length(void)
 	len.userid = 0;
 	len.groupid = 0;
 	len.nlink = 0;
+	len.block = 0;
+	return (len);
+}
+
+static int		len_nbr(unsigned int nbr)
+{
+	int len;
+
+	len = 0;
+	if (nbr == 0)
+		return (1);
+	while (nbr != 0)
+	{
+		nbr /= 10;
+		len++;
+	}
+	return (len);
+}
+
+static t_length	len_bonus_option(t_env *e, t_args *arg, t_length len)
+{
+	int size;
+
+	size = 0;
+	if (e->flag.show_size)
+	{
+		while (arg)
+		{
+			size = len_nbr(arg->block);
+			if (len.block < size)
+				len.block = size;
+			arg = arg->next;
+		}
+	}
 	return (len);
 }
 
@@ -28,7 +62,8 @@ t_length		len_for_option(t_env *e, t_args *arg)
 	t_length len;
 
 	len = init_length();
-	if (e->flag.long_list == 1)
+	len = len_bonus_option(e, arg, len);
+	if (e->flag.long_list)
 	{
 		while (arg)
 		{

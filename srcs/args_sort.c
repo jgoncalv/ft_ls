@@ -93,6 +93,8 @@ static void		sort_list(t_args **alst, t_env *e)
 
 void			arg_sort(t_args **alst, t_env *e)
 {
+	if (e->flag.dont_sort)
+		return ;
 	sort_list(alst, e);
 	if (e->flag.reverse)
 		reverse_list(alst);

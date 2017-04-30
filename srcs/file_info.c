@@ -75,8 +75,8 @@ void		get_file_info(t_env *e, t_args *arg, char *file_path)
 	struct group	*group;
 	char			link[2048];
 
-	if ((e->flag.long_list == 1 || e->flag.time == 1) &&
-		lstat_args(file_path, &buf, e))
+	if ((e->flag.long_list || e->flag.time ||
+		e->flag.show_size) && lstat_args(file_path, &buf, e))
 	{
 		user = getpwuid(buf.st_uid);
 		group = getgrgid(buf.st_gid);
